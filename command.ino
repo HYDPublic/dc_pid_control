@@ -1,13 +1,15 @@
+#define DEBUG true
+
 /* EasyComm 2 Protocol */
 double * cmd_proc()
 {
   static double set_point[] = {0, 0};
   /* Serial */
-  char buffer[BufferSize];
+  static char buffer[BufferSize];
+  static int BufferCnt = 0;
   char incomingByte;
   char *Data = buffer;
   char *rawData;
-  static int BufferCnt = 0;
   char data[100];
   double pos[2];
 
@@ -22,7 +24,9 @@ double * cmd_proc()
     if (incomingByte == '\n' || incomingByte == '\r')
     {
       buffer[BufferCnt] = 0;
-
+#ifdef DEBUG
+      Serial.print("command: ");Serial.println(buffer);
+#endif
       delay(100); // delay before sending just in case
       if (buffer[0] == 'A' && buffer[1] == 'Z')
       {
@@ -47,14 +51,13 @@ double * cmd_proc()
           if (isNumber(data))
           {
             set_point[0] = atof(data);
-            if (set_point[0] > 180) set_point[0] = set_point[0] - 360;
             if (set_point[0] > MAX_AZ_ANGLE)
               set_point[0] = MAX_AZ_ANGLE;
             else if (set_point[0] < MIN_AZ_ANGLE)
               set_point[0] = MIN_AZ_ANGLE;
           }
           /* Get the absolute value of angle */
-          rawData = strtok_r(Data, " " , &Data);
+          rawData = strtok_r(NULL, " " , &Data);
           if (rawData[0] == 'E' && rawData[1] == 'L')
           {
             strncpy(data, rawData + 2, 10);
@@ -111,6 +114,99 @@ double * cmd_proc()
         set_point[0] = 0;
         set_point[1] = 0;
       }
+      else if (buffer[0] == 'K' && buffer[1] == 'A') {
+        /* Get the absolute value of angle */
+        rawData = strtok_r(Data, " " , &Data);
+        strncpy(data, rawData + 2, 10);
+        if (isNumber(data))
+        {
+            AZ_Kp = atof(data);
+        }
+        /* Get the absolute value of angle */
+        rawData = strtok_r(NULL, " " , &Data);
+        if (rawData[0] == 'I' && rawData[1] == 'A')
+        {
+          strncpy(data, rawData + 2, 10);
+          if (isNumber(data))
+          {
+            AZ_Ki = atof(data);
+          }
+        }
+        /* Get the absolute value of angle */
+        rawData = strtok_r(NULL, " " , &Data);
+        if (rawData[0] == 'D' && rawData[1] == 'A')
+        {
+          strncpy(data, rawData + 2, 10);
+          if (isNumber(data))
+          {
+            AZ_Kd = atof(data);
+          }
+        }
+        Serial.print("AZ_Kp: ");Serial.print(AZ_Kp);
+        Serial.print(" AZ_Ki: ");Serial.print(AZ_Ki);
+        Serial.print(" AZ_Kd: ");Serial.println(AZ_Kd);
+        pidAZ.SetTunings(AZ_Kp, AZ_Ki, AZ_Kd);
+      }
+      else if (buffer[0] == 'K' && buffer[1] == 'E') {
+        /* Get the absolute value of angle */
+        rawData = strtok_r(Data, " " , &Data);
+        strncpy(data, rawData + 2, 10);
+        if (isNumber(data))
+        {
+            EL_Kp = atof(data);
+        }
+        /* Get the absolute value of angle */
+        rawData = strtok_r(NULL, " " , &Data);
+        if (rawData[0] == 'I' && rawData[1] == 'E')
+        {
+          strncpy(data, rawData + 2, 10);
+          if (isNumber(data))
+          {
+            EL_Ki = atof(data);
+          }
+        }
+        /* Get the absolute value of angle */
+        rawData = strtok_r(NULL, " " , &Data);
+        if (rawData[0] == 'D' && rawData[1] == 'E')
+        {
+          strncpy(data, rawData + 2, 10);
+          if (isNumber(data))
+          {
+            EL_Kd = atof(data);
+          }
+        }
+        Serial.print("EL_Kp: ");Serial.print(EL_Kp);
+        Serial.print(" EL_Ki: ");Serial.print(EL_Ki);
+        Serial.print(" EL_Kd: ");Serial.println(EL_Kd);
+        pidEL.SetTunings(EL_Kp, EL_Ki, EL_Kd);
+      }
+      else if (buffer[0] == 'D' && buffer[1] == 'E')
+      {
+        debug = !debug;
+      }
+      else if (buffer[0] == 'S' && buffer[1] == 'T')
+      {
+        Serial.print("Status\n");
+        Serial.print("AZ_Kp: ");Serial.print(AZ_Kp);
+        Serial.print(" AZ_Ki: ");Serial.print(AZ_Ki);
+        Serial.print(" AZ_Kd: ");Serial.println(AZ_Kd);
+        Serial.print("EL_Kp: ");Serial.print(EL_Kp);
+        Serial.print(" EL_Ki: ");Serial.print(EL_Ki);
+        Serial.print(" EL_Kd: ");Serial.println(EL_Kd);
+        Serial.print(millis());
+        Serial.print(" setpointAZ: ");Serial.print(setpointAZ);
+        Serial.print(" inputAZ: ");Serial.print(inputAZ);
+        Serial.print(" outputAZ:");Serial.print(outputAZ);
+
+        Serial.print(" setpointEL: ");Serial.print(setpointEL);
+        Serial.print(" inputEL: ");Serial.print(inputEL);
+        Serial.print(" outputEL:");Serial.println(outputEL);
+      }
+      else if (buffer[0] == 'F' && buffer[1] == 'A')
+      {
+        fatal(FATAL_USER);
+      }
+
       BufferCnt = 0;
       /* Reset the disable motor time */
       //t_DIS = 0;
@@ -119,6 +215,7 @@ double * cmd_proc()
     else {
       buffer[BufferCnt] = incomingByte;
       BufferCnt++;
+      if (BufferCnt>=BufferSize) BufferCnt=0;
     }
   }
   delay(5);
