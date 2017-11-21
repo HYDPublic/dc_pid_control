@@ -12,11 +12,17 @@ public:
   }
   
   void move(short speed) {
-    if (abs(speed)<_minSpeed) {
-      if (abs(speed)>0) speed=sign(speed)*_minSpeed;
+//    if (abs(speed)<_minSpeed) {
+//      if (abs(speed)>0) speed=sign(speed)*_minSpeed;
+//    }
+    if (speed == 0) {
+      stop();
+      return;
     }
+    
     if (speed >= 0)
     {
+      speed = speed + _minSpeed;
       if (speed > _maxSpeed)
         speed = _maxSpeed;
       analogWrite(_pwm_pin1, 0);
@@ -26,6 +32,7 @@ public:
     else
     {
       speed = -speed;
+      speed = speed + _minSpeed;
       if ( speed > _maxSpeed)
         speed = _maxSpeed;
       analogWrite(_pwm_pin1, speed);
