@@ -47,10 +47,10 @@ void Homing(bool Init)
     encoder_EL.get_pos(&inputEL);
     Serial.print("current AZ: "); Serial.print(setpointAZ); Serial.print("/"); Serial.print(inputAZ);Serial.print(" outputAZ:");Serial.print(outputAZ);
     Serial.print(" current EL: "); Serial.print(setpointEL); Serial.print("/"); Serial.print(inputEL);Serial.print(" outputEL:");Serial.println(outputEL);
-    if ((inputAZ - startAZ) >= (abs(SEEK_MOVE)-DEADZONE_AZ) && !isHome_AZ && Init) {
+    if (abs(inputAZ - startAZ) >= (abs(SEEK_MOVE)-DEADZONE_AZ) && !isHome_AZ && Init) {
       seek_AZ = true;
     }
-    if ((inputEL - startEL) >= (abs(SEEK_MOVE)-DEADZONE_EL) && !isHome_EL && Init) {
+    if (abs(inputEL - startEL) >= (abs(SEEK_MOVE)-DEADZONE_EL) && !isHome_EL && Init) {
       seek_EL = true;
     }
   }

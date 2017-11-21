@@ -1,0 +1,176 @@
+set_zero: -101.13
+
+homing EL: 0.00/-0.04 outputEL:0.07
+
+current AZ: 0.00/-0.13 outputAZ:0.53 current EL: 0.00/-0.18 outputEL:0.26
+
+Testing...Reached setpoint29296 setpointAZ: 0.00 inputAZ: -0.04 outputAZ:0.18 setpointEL: 10.00 inputEL: 9.89 outputEL:0.66
+
+Manual control
+
+Start position: 9.89
+
+curEL: 10.11
+
+threshold: 110.00
+
+Reached setpoint45940 setpointAZ: 0.00 inputAZ: -0.04 outputAZ:0.18 setpointEL: 20.00 inputEL: 19.87 outputEL:0.55
+
+Manual control
+
+Start position: 19.87
+
+curEL: 20.13
+
+threshold: 112.00
+
+Reached setpoint62685 setpointAZ: 0.00 inputAZ: -0.04 outputAZ:0.18 setpointEL: 30.00 inputEL: 29.84 outputEL:0.59
+
+Manual control
+
+Start position: 29.84
+
+curEL: 30.06
+
+threshold: 112.00
+
+Reached setpoint79430 setpointAZ: 0.00 inputAZ: -0.04 outputAZ:0.18 setpointEL: 40.00 inputEL: 39.64 outputEL:0.94
+
+Manual control
+
+Start position: 39.64
+
+curEL: 39.86
+
+threshold: 111.00
+
+Reached setpoint96124 setpointAZ: 0.00 inputAZ: -0.04 outputAZ:0.18 setpointEL: 50.00 inputEL: 49.84 outputEL:0.61
+
+Manual control
+
+Start position: 49.84
+
+curEL: 50.06
+
+threshold: 110.00
+
+Reached setpoint112768 setpointAZ: 0.00 inputAZ: -0.04 outputAZ:0.18 setpointEL: 60.00 inputEL: 59.68 outputEL:0.87
+
+Manual control
+
+Start position: 59.64
+
+curEL: 59.86
+
+threshold: 108.00
+
+Reached setpoint129311 setpointAZ: 0.00 inputAZ: -0.04 outputAZ:0.18 setpointEL: 70.00 inputEL: 69.62 outputEL:0.99
+
+Manual control
+
+Start position: 69.62
+
+curEL: 69.92
+
+threshold: 113.00
+
+Reached setpoint146108 setpointAZ: 0.00 inputAZ: -0.04 outputAZ:0.18 setpointEL: 80.00 inputEL: 79.64 outputEL:0.95
+
+Manual control
+
+Start position: 79.64
+
+curEL: 79.86
+
+threshold: 117.00
+
+Reached setpoint163106 setpointAZ: 0.00 inputAZ: -0.04 outputAZ:0.18 setpointEL: 90.00 inputEL: 89.61 outputEL:0.99
+
+Manual control
+
+Start position: 89.61
+
+curEL: 89.88
+
+threshold: 115.00
+
+Reached setpoint180003 setpointAZ: 0.00 inputAZ: -0.04 outputAZ:0.18 setpointEL: 90.00 inputEL: 89.97 outputEL:0.06
+
+Manual control
+
+Start position: 89.97
+
+curEL: 89.75
+
+threshold: -114.00
+
+Reached setpoint196850 setpointAZ: 0.00 inputAZ: -0.04 outputAZ:0.18 setpointEL: 80.00 inputEL: 80.34 outputEL:-0.86
+
+Manual control
+
+Start position: 80.34
+
+curEL: 80.12
+
+threshold: -113.00
+
+Reached setpoint213646 setpointAZ: 0.00 inputAZ: -0.04 outputAZ:0.18 setpointEL: 70.00 inputEL: 70.32 outputEL:-0.84
+
+Manual control
+
+Start position: 70.32
+
+curEL: 70.10
+
+threshold: -109.00
+
+Reached setpoint230240 setpointAZ: 0.00 inputAZ: -0.04 outputAZ:0.18 setpointEL: 60.00 inputEL: 60.34 outputEL:-0.89
+
+Manual control
+
+Start position: 60.34
+
+curEL: 60.12
+
+threshold: -106.00
+
+Reached setpoint246683 setpointAZ: 0.00 inputAZ: -0.04 outputAZ:0.18 setpointEL: 50.00 inputEL: 50.32 outputEL:-0.85
+
+Manual control
+
+Start position: 50.32
+
+curEL: 50.06
+
+threshold: -107.00
+
+Reached setpoint263176 setpointAZ: 0.00 inputAZ: -0.04 outputAZ:0.18 setpointEL: 40.00 inputEL: 40.21 outputEL:-0.65
+
+Manual control
+
+Start position: 40.26
+
+curEL: 39.99
+
+threshold: -110.00
+
+Reached setpoint279821 setpointAZ: 0.00 inputAZ: -0.04 outputAZ:0.18 setpointEL: 30.00 inputEL: 30.24 outputEL:-0.70
+
+Manual control
+
+Start position: 30.24
+
+curEL: 29.93
+
+threshold: -111.00
+
+Reached setpoint296516 setpointAZ: 0.00 inputAZ: -0.04 outputAZ:0.18 setpointEL: 20.00 inputEL: 20.35 outputEL:-0.86
+
+Manual control
+
+Start position: 20.35
+
+curEL: 20.09
+
+threshold: -109.00
+

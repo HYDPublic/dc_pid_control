@@ -51,6 +51,10 @@ public:
     _maxSpeed = max;
   }
   
+  void set_min(unsigned short min) {
+    _minSpeed = min;
+  }
+
 private:
   unsigned char _pwm_pin1, _pwm_pin2;
   unsigned short _maxSpeed, _minSpeed;

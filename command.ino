@@ -193,14 +193,7 @@ double * cmd_proc()
         Serial.print("EL_Kp: ");Serial.print(EL_Kp);
         Serial.print(" EL_Ki: ");Serial.print(EL_Ki);
         Serial.print(" EL_Kd: ");Serial.println(EL_Kd);
-        Serial.print(millis());
-        Serial.print(" setpointAZ: ");Serial.print(setpointAZ);
-        Serial.print(" inputAZ: ");Serial.print(inputAZ);
-        Serial.print(" outputAZ:");Serial.print(outputAZ);
-
-        Serial.print(" setpointEL: ");Serial.print(setpointEL);
-        Serial.print(" inputEL: ");Serial.print(inputEL);
-        Serial.print(" outputEL:");Serial.println(outputEL);
+        stat1();
       }
       else if (buffer[0] == 'F' && buffer[1] == 'A')
       {

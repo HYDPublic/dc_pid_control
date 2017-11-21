@@ -46,22 +46,22 @@ AS5601<SoftWire> encoder_EL(Wire2);
 #define TX_EN 2
 
 #define MAXSPEED_AZ 140
-#define MAXSPEED_EL 165
-#define OFFSET_SPEED_AZ 9
-#define OFFSET_SPEED_EL 107
+#define MAXSPEED_EL 140
+#define OFFSET_SPEED_AZ 12
+#define OFFSET_SPEED_EL 109
 
-#define DEADZONE_AZ 0.15
-#define DEADZONE_EL 0.4
+#define DEADZONE_AZ 0.2
+#define DEADZONE_EL 0.5
 
 motor motor_AZ(PWM1M1, PWM2M1, MAXSPEED_AZ, OFFSET_SPEED_AZ);
 motor motor_EL(PWM1M2, PWM2M2, MAXSPEED_EL, OFFSET_SPEED_EL);
 
-#define AZ_KP          7
+#define AZ_KP          4
 #define AZ_KI          0.0
 #define AZ_KD          0.1
 
-#define EL_KP          4
-#define EL_KI          0.0
+#define EL_KP          1.5
+#define EL_KI          0.05
 #define EL_KD          0.1
 
 #define EL_KP_LOCAL          1.5
@@ -139,6 +139,8 @@ void setup() {
   Serial.print(sizeof(ovf_count));
 
   Homing(true);
+
+  Testing();
 }
 
 void enableTimedInt()
@@ -219,11 +221,6 @@ void loop() {
   double *set_point;
   static bool EL_local = false;
 
-//  if ((millis() - startTime) >= 1000) {
-//    motor_AZ.move(-50);
-//    setpointAZ = 10;
-//  }
-
     /* Read commands from serial */
   set_point = cmd_proc();
   setpointAZ = set_point[0];
@@ -238,39 +235,6 @@ void loop() {
     pidEL.SetTunings(EL_KP, EL_KI, EL_KD);
     EL_local = false;    
   }
-  // put your main code here, to run repeatedly:
-//  while(semTake(0));
-//  statusAZ = encoder_AZ.get_pos(&posAZ);
-//  semGive();
-//  
-//  while(semTake(0));
-//  confAZ = encoder_AZ.get_conf();
-//  semGive();
-//
-//  while(semTake(0));
-//  magAZ = encoder_AZ.get_magnitude();
-//  semGive();
-//
-//  while(semTake(0));
-//  agcAZ = encoder_AZ.get_agc();
-//  semGive();
-//
-//  while(semTake(0));
-//  statusEL = encoder_EL.get_pos(&posEL);
-//  semGive();
-//  
-//  while(semTake(0));
-//  confEL = encoder_EL.get_conf();
-//  semGive();
-//
-//  while(semTake(0));
-//  magEL = encoder_EL.get_magnitude();
-//  semGive();
-//
-//  while(semTake(0));
-//  agcEL = encoder_EL.get_agc();
-//  semGive();
-
   if (pingEncoders)
   {
     pingEncoders = false;
@@ -281,14 +245,7 @@ void loop() {
   //Serial.print("Status:");Serial.print(statusAZ,HEX);Serial.print(" posAZ:");Serial.print(posAZ);Serial.print(" CONF: ");Serial.print(confAZ);Serial.print(" MAG: ");Serial.print(magAZ);Serial.print(" AGC: ");Serial.println(agcAZ);
   //Serial.print("Status:");Serial.print(statusEL,HEX);Serial.print(" posEL:");Serial.print(posEL);Serial.print(" CONF: ");Serial.print(confEL);Serial.print(" MAG: ");Serial.print(magEL);Serial.print(" AGC: ");Serial.println(agcEL);
   if (debug) {
-    Serial.print(millis());
-    Serial.print(" setpointAZ: ");Serial.print(setpointAZ);
-    Serial.print(" inputAZ: ");Serial.print(inputAZ);
-    Serial.print(" outputAZ:");Serial.print(outputAZ);
-    
-    Serial.print(" setpointEL: ");Serial.print(setpointEL);
-    Serial.print(" inputEL: ");Serial.print(inputEL);
-    Serial.print(" outputEL:");Serial.println(outputEL);
+    stat1();
   }
   
   //Serial.println(ovf_count);
