@@ -117,7 +117,7 @@ private:
     _wire.beginTransmission(i2c_address);
     _wire.write(i2c_register);
     _wire.endTransmission();
-    _wire.requestFrom(i2c_address, 1);
+    _wire.requestFrom(i2c_address, (uint8_t)1);
     while (_wire.available() == 0);
     return _wire.read();
   }
