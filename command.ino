@@ -184,6 +184,10 @@ double * cmd_proc()
       {
         debug = !debug;
       }
+      else if (buffer[0] == 'A' && buffer[1] == 'T')
+      {
+        adaptiveTuning = !adaptiveTuning;
+      }
       else if (buffer[0] == 'S' && buffer[1] == 'T')
       {
         Serial.print("Status\n");
@@ -201,6 +205,7 @@ double * cmd_proc()
         Serial.print(" setpointEL: ");Serial.print(setpointEL);
         Serial.print(" inputEL: ");Serial.print(inputEL);
         Serial.print(" outputEL:");Serial.println(outputEL);
+        Serial.print("adaptive: ");Serial.println((adaptiveTuning?"on":"off"));
       }
       else if (buffer[0] == 'F' && buffer[1] == 'A')
       {
