@@ -1,0 +1,10 @@
+This test function I used to measure the stiction in the elevation axis.
+Stiction is the force that is required to get the motor into motion. It is typically higher than the friction when the motor is moving.
+Due to the heavy load I noticed that a significant part of the PWM range was not resulting in motion.
+The PID controller then oversteers (especially I term). 
+Therefor I add this static value of stiction in the motor control and let the PID control the remainder of the range.
+
+The way the test works is that it moves 10 degrees, stops and then the motor power is slowly increased until motion is sensed.
+That happens for all steps to 90 degrees and then downward. This could show any difference due to gravity.
+However, in my case there was hardly any.
+
