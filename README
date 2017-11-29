@@ -2,6 +2,11 @@ This firmware is meant for the DC motor solution of the v3.1 Satnogs Rotator wit
 It was based on the source code from the satnogs-rotator-controller repository.
 (https://github.com/satnogs/satnogs-rotator-controller roughly at commit d484c5249ea45e8c78a45f39fadb60a1163fa03c)
 
+Required libraries
+- PGMWrap (to store strings, not used at the moment) (http://www.arduinolibraries.info/libraries/pgm-wrap)
+- PID (https://playground.arduino.cc/Code/PIDLibrary)
+- SoftI2CMaster (http://playground.arduino.cc/Main/SoftwareI2CLibrary)
+
 Main changes:
 
 - based on Arduino PID Library (https://playground.arduino.cc/Code/PIDLibrary)
@@ -21,6 +26,7 @@ Todo:
 - integrate RS485 (now using simple uart to Arduino)
 - cleanup command parsing
 - add more safety checks such as current feedback sensing, non-movement etc.
-
+- Add EEPROM stored settings instead of hardcoded defines
+- Add a menu and a switch to edit stored settings on the device
 
 
