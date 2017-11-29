@@ -60,13 +60,17 @@ motor motor_EL(PWM1M2, PWM2M2, MAXSPEED_EL, OFFSET_SPEED_EL);
 #define AZ_KI          0.0
 #define AZ_KD          0.1
 
-#define EL_KP          4
-#define EL_KI          0.0
+#define EL_KP_HOMEING   4
+#define EL_KI_HOMEING   0
+#define EL_KD_HOMEING   0.1
+
+#define EL_KP          6
+#define EL_KI          0
 #define EL_KD          0.1
 
-#define EL_KP_LOCAL          2
+#define EL_KP_LOCAL          3
 #define EL_KI_LOCAL          1
-#define EL_KD_LOCAL          0.1
+#define EL_KD_LOCAL          0.2
 
 #define SAMPLE_TIME    1
 
@@ -138,6 +142,7 @@ void setup() {
   Serial.print("Setup\n");
   Serial.print(sizeof(ovf_count));
 
+  pidEL.SetTunings(EL_KP_HOMEING, EL_KI_HOMEING, EL_KD_HOMEING);
   Homing(true);
 }
 
@@ -232,9 +237,9 @@ void loop() {
   if (adaptiveTuning && !EL_local && abs(setpointEL - inputEL)<2) {
     pidEL.SetTunings(EL_KP_LOCAL, EL_KI_LOCAL, EL_KD_LOCAL);
     EL_local = true;
-    Serial.println("local EL tuning");
+    if (debug) Serial.println("local EL tuning");
   } else if (adaptiveTuning && EL_local && abs(setpointEL - inputEL)>=2) {
-    Serial.println("global EL tuning");
+    if (debug) Serial.println("global EL tuning");
     pidEL.SetTunings(EL_KP, EL_KI, EL_KD);
     EL_local = false;    
   }
