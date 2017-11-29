@@ -1,4 +1,4 @@
-#define DEBUG true
+//#define DEBUG true
 
 /* EasyComm 2 Protocol */
 double * cmd_proc()
@@ -33,15 +33,11 @@ double * cmd_proc()
         if (buffer[2] == ' ' && buffer[3] == 'E' && buffer[4] == 'L')
         {
           /* Get position */
-          digitalWrite(TX_EN, HIGH);
-          delay(5);
           Serial.print("AZ");
           Serial.print(inputAZ, 1);
           Serial.print(" ");
           Serial.print("EL");
           Serial.println(inputEL, 1);
-          delay(5);
-          digitalWrite(TX_EN, LOW);
         }
         else
         {
@@ -70,29 +66,23 @@ double * cmd_proc()
                 set_point[1] = MIN_EL_ANGLE;
             }
           }
-          digitalWrite(TX_EN, HIGH);
-          delay(5);
-          Serial.print(set_point[0]);
-          Serial.print(" ");
-          Serial.print(set_point[1]);
-          Serial.print(" ");
-          delay(5);
-          digitalWrite(TX_EN, LOW);
+          if (debug) {
+            Serial.print(set_point[0]);
+            Serial.print(" ");
+            Serial.print(set_point[1]);
+            Serial.print(" ");
+          }
         }
       }
       /* Stop Moving */
       else if (buffer[0] == 'S' && buffer[1] == 'A' && buffer[2] == ' ' && buffer[3] == 'S' && buffer[4] == 'E')
       {
         /* Get position */
-        digitalWrite(TX_EN, HIGH);
-        delay(5);
         Serial.print("AZ");
         Serial.print(inputAZ, 1);
         Serial.print(" ");
         Serial.print("EL");
         Serial.println(inputEL, 1);
-        delay(5);
-        digitalWrite(TX_EN, LOW);
         set_point[0] = inputAZ;
         set_point[1] = inputEL;
       }
@@ -100,17 +90,13 @@ double * cmd_proc()
       else if (buffer[0] == 'R' && buffer[1] == 'E' && buffer[2] == 'S' && buffer[3] == 'E' && buffer[4] == 'T')
       {
         /* Get position */
-        digitalWrite(TX_EN, HIGH);
-        delay(5);
         Serial.print("AZ");
         Serial.print(inputAZ, 1);
         Serial.print(" ");
         Serial.print("EL");
         Serial.println(inputEL, 1);
-        delay(5);
-        digitalWrite(TX_EN, LOW);
         /* Move to initial position */
-        //Homing(-MAX_AZ_ANGLE, -MAX_EL_ANGLE, false);
+        Homing(false);
         set_point[0] = 0;
         set_point[1] = 0;
       }
@@ -187,16 +173,17 @@ double * cmd_proc()
       else if (buffer[0] == 'A' && buffer[1] == 'T')
       {
         adaptiveTuning = !adaptiveTuning;
+        Serial.print("Adaptive is turned ");Serial.println((adaptiveTuning)?"on":"off");
       }
       else if (buffer[0] == 'S' && buffer[1] == 'T')
       {
         Serial.print("Status\n");
-        Serial.print("AZ_Kp: ");Serial.print(AZ_Kp);
-        Serial.print(" AZ_Ki: ");Serial.print(AZ_Ki);
-        Serial.print(" AZ_Kd: ");Serial.println(AZ_Kd);
-        Serial.print("EL_Kp: ");Serial.print(EL_Kp);
-        Serial.print(" EL_Ki: ");Serial.print(EL_Ki);
-        Serial.print(" EL_Kd: ");Serial.println(EL_Kd);
+        Serial.print("AZ_Kp: ");Serial.print(pidAZ.GetKp());
+        Serial.print(" AZ_Ki: ");Serial.print(pidAZ.GetKi());
+        Serial.print(" AZ_Kd: ");Serial.println(pidAZ.GetKd());
+        Serial.print("EL_Kp: ");Serial.print(pidEL.GetKp());
+        Serial.print(" EL_Ki: ");Serial.print(pidEL.GetKi());
+        Serial.print(" EL_Kd: ");Serial.println(pidEL.GetKd());
         Serial.print(millis());
         Serial.print(" setpointAZ: ");Serial.print(setpointAZ);
         Serial.print(" inputAZ: ");Serial.print(inputAZ);
@@ -223,8 +210,6 @@ double * cmd_proc()
       if (BufferCnt>=BufferSize) BufferCnt=0;
     }
   }
-  delay(5);
-  digitalWrite(TX_EN, LOW );
   return set_point;
 }
 
