@@ -15,6 +15,12 @@ public:
 //    if (abs(speed)<_minSpeed) {
 //      if (abs(speed)>0) speed=sign(speed)*_minSpeed;
 //    }
+    dbgcount++;
+    if ((dbgcount>1000) && (speed!=0)) {
+      dbgcount=0;
+      Serial.print("speed: ");Serial.print(speed);
+    }
+    
     if (speed == 0) {
       stop();
       return;
@@ -39,12 +45,16 @@ public:
       analogWrite(_pwm_pin2, 0);
       //Serial.print("links pwm1 ");Serial.print(_pwm_pin1);Serial.print("pwm2 ");Serial.print(_pwm_pin2);Serial.print("speed: ");Serial.println(speed);
     }
+    stopped = false;
   }
 
   void stop()
   {
+    if (!stopped) {
       analogWrite(_pwm_pin1, 0);
       analogWrite(_pwm_pin2, 0);
+      stopped = true;
+    }
   }
 
   void set_max(unsigned short max) {
@@ -54,7 +64,9 @@ public:
 private:
   unsigned char _pwm_pin1, _pwm_pin2;
   unsigned short _maxSpeed, _minSpeed;
-
+  unsigned short dbgcount = 0;
+  boolean stopped = true;
+  
   sign(int x) {
     return (x > 0) - (x < 0);
   }
