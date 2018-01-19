@@ -46,9 +46,9 @@ AS5601<SoftWire> encoder_EL(Wire2);
 #define TX_EN 2
 
 #define MAXSPEED_AZ 140
-#define MAXSPEED_EL 150
-#define OFFSET_SPEED_AZ 9
-#define OFFSET_SPEED_EL 115
+#define MAXSPEED_EL 160
+#define OFFSET_SPEED_AZ 18
+#define OFFSET_SPEED_EL 120
 
 #define DEADZONE_AZ 0.2
 #define DEADZONE_EL 0.3
@@ -56,7 +56,7 @@ AS5601<SoftWire> encoder_EL(Wire2);
 motor motor_AZ(PWM1M1, PWM2M1, MAXSPEED_AZ, OFFSET_SPEED_AZ);
 motor motor_EL(PWM1M2, PWM2M2, MAXSPEED_EL, OFFSET_SPEED_EL);
 
-#define AZ_KP          5
+#define AZ_KP          5.5
 #define AZ_KI          0.0
 #define AZ_KD          0.1
 
@@ -68,20 +68,21 @@ motor motor_EL(PWM1M2, PWM2M2, MAXSPEED_EL, OFFSET_SPEED_EL);
 #define EL_KI          0
 #define EL_KD          0.1
 
-#define EL_KP_LOCAL          3
+#define EL_KP_LOCAL          2.3
 #define EL_KI_LOCAL          1
 #define EL_KD_LOCAL          0.2
 
-#define SAMPLE_TIME    1
+#define SAMPLE_TIME    10
 
 volatile double setpointAZ, inputAZ, outputAZ;
 volatile double setpointEL, inputEL, outputEL;
 double AZ_Kp = AZ_KP, AZ_Ki = AZ_KI, AZ_Kd = AZ_KD;
 double EL_Kp = EL_KP, EL_Ki = EL_KI, EL_Kd = EL_KD;
 bool adaptiveTuning = true;
+#define PON P_ON_E
 
-PID pidAZ(&inputAZ, &outputAZ, &setpointAZ, AZ_Kp, AZ_Ki, AZ_Kd, P_ON_E,DIRECT);
-PID pidEL(&inputEL, &outputEL, &setpointEL, EL_Kp, EL_Ki, EL_Kd, P_ON_E,DIRECT);
+PID pidAZ(&inputAZ, &outputAZ, &setpointAZ, AZ_Kp, AZ_Ki, AZ_Kd, PON,DIRECT);
+PID pidEL(&inputEL, &outputEL, &setpointEL, EL_Kp, EL_Ki, EL_Kd, PON,DIRECT);
 
 volatile bool initialized = false;
 volatile bool pingEncoders = false;
@@ -91,6 +92,8 @@ bool debug = false;
 int startTime;
 
 void setup() {
+  double limitAZ, limitEL;
+  
   Serial.begin(BaudRate);
   Serial.print("1. Init\n");
 
@@ -115,41 +118,45 @@ void setup() {
   //encoder_AZ.set_zero();
   encoder_AZ.get_pos(&inputAZ);
   setpointAZ = inputAZ;
-
+  outputAZ = 0;
+  
   encoder_EL.Begin();
   //encoder_EL.set_zero();
   encoder_EL.get_pos(&inputEL);
   setpointEL = inputEL;
+  outputEL = 0;
 
   Serial.print("2. Init encoders\n");
 
+  setPWMfreq();
+  enableTimedInt();
+
+  Serial.print("3. Init timers\n");
+
   pidAZ.SetSampleTime(SAMPLE_TIME);
-  pidAZ.SetOutputLimits(-(MAXSPEED_AZ-OFFSET_SPEED_AZ),(MAXSPEED_AZ-OFFSET_SPEED_AZ));
+  limitAZ = MAXSPEED_AZ-OFFSET_SPEED_AZ;
+  pidAZ.SetOutputLimits(-limitAZ,limitAZ);
   pidAZ.SetMode(AUTOMATIC);
 
   pidEL.SetSampleTime(SAMPLE_TIME);
-  pidEL.SetOutputLimits(-(MAXSPEED_EL-OFFSET_SPEED_EL),(MAXSPEED_EL-OFFSET_SPEED_EL));
+  limitEL = MAXSPEED_EL-OFFSET_SPEED_EL;
+  pidEL.SetOutputLimits(-limitEL,limitEL);
   pidEL.SetMode(AUTOMATIC);
 
-  Serial.print("3. Init PIDs\n");
-
-  setPWMfreq();
-  enableTimedInt();
+  Serial.print("4. Init PIDs\n");
 
   startTime = millis();
   
   initialized = true;
   Serial.print("Setup\n");
-  Serial.print(sizeof(ovf_count));
 
-  pidEL.SetTunings(EL_KP_HOMEING, EL_KI_HOMEING, EL_KD_HOMEING);
   Homing(true);
 }
 
 void enableTimedInt()
 {
   // initialize counter
-  TCNT2 = 5; // 250*4e-6 = 1e-3
+  TCNT2 = 5; // 250*4e-6 = 1e-3  4e-6=16e6/64
   TIMSK2 |= (1 << TOIE2); //overflow interrupt enable
 
 }
@@ -163,21 +170,13 @@ void disableTimedInt()
 }
 ISR(TIMER2_OVF_vect)
 {
-  ovf_count++;               //Increments the overflow counter
-
-  if (ovf_count >= 1000000)
-  {
-    ovf_count = 0;       //Resets the overflow counter
-  }
-
   if (!initialized) return;
+  
+  ovf_count++;               //Increments the overflow counter
+  if (ovf_count < SAMPLE_TIME) return;  // reduce PID frequency
+  
+  ovf_count = 0;       //Resets the overflow counter
 
-//  if (abs(setpointAZ-inputAZ) < DEADZONE_AZ) {
-//      pidAZ.SetMode(MANUAL);
-//  } else {
-//      pidAZ.SetMode(AUTOMATIC);
-//  }
-//
   pidAZ.Compute();
   motor_AZ.move(outputAZ);
   pidEL.Compute();
@@ -223,6 +222,7 @@ void loop() {
   unsigned short confAZ, confEL, magAZ, magEL, agcAZ, agcEL;
   double *set_point;
   static bool EL_local = false;
+  static unsigned int dbgcount = 0;
 
 //  if ((millis() - startTime) >= 1000) {
 //    motor_AZ.move(-50);
@@ -235,12 +235,12 @@ void loop() {
   setpointEL = set_point[1];
 
   if (adaptiveTuning && !EL_local && abs(setpointEL - inputEL)<2) {
-    pidEL.SetTunings(EL_KP_LOCAL, EL_KI_LOCAL, EL_KD_LOCAL);
+    pidEL.SetTunings(EL_KP_LOCAL, EL_KI_LOCAL, EL_KD_LOCAL, PON);
     EL_local = true;
     if (debug) Serial.println("local EL tuning");
   } else if (adaptiveTuning && EL_local && abs(setpointEL - inputEL)>=2) {
     if (debug) Serial.println("global EL tuning");
-    pidEL.SetTunings(EL_KP, EL_KI, EL_KD);
+    pidEL.SetTunings(EL_KP, EL_KI, EL_KD, PON);
     EL_local = false;    
   }
   // put your main code here, to run repeatedly:
@@ -286,14 +286,19 @@ void loop() {
   //Serial.print("Status:");Serial.print(statusAZ,HEX);Serial.print(" posAZ:");Serial.print(posAZ);Serial.print(" CONF: ");Serial.print(confAZ);Serial.print(" MAG: ");Serial.print(magAZ);Serial.print(" AGC: ");Serial.println(agcAZ);
   //Serial.print("Status:");Serial.print(statusEL,HEX);Serial.print(" posEL:");Serial.print(posEL);Serial.print(" CONF: ");Serial.print(confEL);Serial.print(" MAG: ");Serial.print(magEL);Serial.print(" AGC: ");Serial.println(agcEL);
   if (debug) {
+    dbgcount++;
+    double myEL=outputEL, myAZ=outputAZ, myinEL = inputEL;
+    if ((dbgcount > 1000) && ((myEL>1) || (myAZ>1))) {
     Serial.print(millis());
     Serial.print(" setpointAZ: ");Serial.print(setpointAZ);
     Serial.print(" inputAZ: ");Serial.print(inputAZ);
-    Serial.print(" outputAZ:");Serial.print(outputAZ);
+    Serial.print(" outputAZ:");Serial.print(myAZ);
     
     Serial.print(" setpointEL: ");Serial.print(setpointEL);
-    Serial.print(" inputEL: ");Serial.print(inputEL);
-    Serial.print(" outputEL:");Serial.println(outputEL);
+    Serial.print(" inputEL: ");Serial.print(myinEL);
+    Serial.print(" outputEL:");Serial.println(myEL);
+    dbgcount=0;
+    }
   }
   
   //Serial.println(ovf_count);

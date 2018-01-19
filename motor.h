@@ -15,12 +15,12 @@ public:
 //    if (abs(speed)<_minSpeed) {
 //      if (abs(speed)>0) speed=sign(speed)*_minSpeed;
 //    }
-    dbgcount++;
-    if ((dbgcount>1000) && (speed!=0)) {
-      dbgcount=0;
-      Serial.print("speed: ");Serial.print(speed);
-    }
-    
+//    dbgcount++;
+//    if ((dbgcount>1000) && (speed!=0)) {
+//      dbgcount=0;
+//      Serial.print("speed: ");Serial.print(speed);
+//    }
+//    
     if (speed == 0) {
       stop();
       return;

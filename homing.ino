@@ -25,6 +25,8 @@ void Homing(bool Init)
   double curr_angle[2];
   double set_point[2];
 
+  pidEL.SetTunings(EL_KP_HOMEING, EL_KI_HOMEING, EL_KD_HOMEING, PON);
+
   encoder_AZ.get_pos(&startAZ);
   encoder_EL.get_pos(&startEL);
       
@@ -68,13 +70,13 @@ void Homing(bool Init)
     {
       isHome_AZ = true;
       pidAZ.SetMode(MANUAL);
+      outputAZ=0;
+      motor_AZ.stop();
       if (Init)
         encoder_AZ.set_zero();
       encoder_AZ.get_pos(&inputAZ);
       setpointAZ = 0;
-      outputAZ=0;
-      motor_AZ.stop();
-      //pidAZ.SetTunings(AZ_Kp, AZ_Ki, AZ_Kd);
+      pidAZ.SetTunings(AZ_Kp, AZ_Ki, AZ_Kd, PON);
       pidAZ.SetMode(AUTOMATIC);
       Serial.print("homing AZ: "); Serial.print(setpointAZ); Serial.print("/"); Serial.print(inputAZ);Serial.print(" outputAZ:");Serial.println(outputAZ);
     }
@@ -84,27 +86,24 @@ void Homing(bool Init)
     {
       isHome_EL = true;
       pidEL.SetMode(MANUAL);      
+      outputEL = 0;
+      motor_EL.stop();
       if (Init)
         encoder_EL.set_zero();;
       encoder_EL.get_pos(&inputEL);
       setpointEL = 0;
-      outputEL = 0;
-      motor_EL.stop();
-      pidEL.SetTunings(EL_Kp, EL_Ki, EL_Kd);
+      pidEL.SetTunings(EL_Kp, EL_Ki, EL_Kd, PON);
       pidEL.SetMode(AUTOMATIC);
       Serial.print("homing EL: "); Serial.print(setpointEL); Serial.print("/"); Serial.print(inputEL);Serial.print(" outputEL:");Serial.println(outputEL);
     }
     encoder_AZ.get_pos(&inputAZ);
     encoder_EL.get_pos(&inputEL);
-#ifdef DEBUG
-    digitalWrite(TX_EN, HIGH);
-    Serial.print("current AZ: "); Serial.print(setpointAZ); Serial.print("/"); Serial.print(inputAZ);Serial.print(" outputAZ:");Serial.print(outputAZ);
-    Serial.print(" current EL: "); Serial.print(setpointEL); Serial.print("/"); Serial.print(inputEL);Serial.print(" outputEL:");Serial.println(outputEL);
+    if (debug) {
+      Serial.print("current AZ: "); Serial.print(setpointAZ); Serial.print("/"); Serial.print(inputAZ);Serial.print(" outputAZ:");Serial.print(outputAZ);
+      Serial.print(" current EL: "); Serial.print(setpointEL); Serial.print("/"); Serial.print(inputEL);Serial.print(" outputEL:");Serial.println(outputEL);
 //    Serial.print(getM1CurrentMilliamps());Serial.print(" ");
 //    Serial.print(getM2CurrentMilliamps());Serial.print("\n");
-    digitalWrite(TX_EN, LOW);
-#endif
-      
+    }      
     if ((abs(inputAZ - startAZ) >= abs(SEEK_AZ_ANGLE-DEADZONE_AZ) && !isHome_AZ) || (abs(inputEL - startEL) >= abs(SEEK_EL_ANGLE-DEADZONE_EL) && !isHome_EL))
     {
       fatal(FATAL_HOMING);
