@@ -166,7 +166,7 @@ double * cmd_proc()
         Serial.print(" EL_Kd: ");Serial.println(EL_Kd);
         pidEL.SetTunings(EL_Kp, EL_Ki, EL_Kd);
       }
-      else if (buffer[0] == 'D' && buffer[1] == 'E')
+      else if (buffer[0] == 'D' && buffer[1] == 'B')
       {
         debug = !debug;
       }
