@@ -1,4 +1,4 @@
-//#define DEBUG true
+#define DEBUG true
 
 /* EasyComm 2 Protocol */
 double * cmd_proc()
@@ -14,18 +14,18 @@ double * cmd_proc()
   double pos[2];
 
   /* Read from serial */
-  while (Serial.available() > 0)
+  while (myRS485Serial.available() > 0)
   {
-    incomingByte = Serial.read();
+    incomingByte = myRS485Serial.read();
 #ifdef DEBUG
-    Serial.print(incomingByte);
+    myRS485Serial.print(incomingByte);
 #endif
     /* New data */
     if (incomingByte == '\n' || incomingByte == '\r')
     {
       buffer[BufferCnt] = 0;
 #ifdef DEBUG
-      Serial.print("command: ");Serial.println(buffer);
+      myRS485Serial.print("command: ");myRS485Serial.println(buffer);
 #endif
       delay(100); // delay before sending just in case
       if (buffer[0] == 'A' && buffer[1] == 'Z')
@@ -33,11 +33,11 @@ double * cmd_proc()
         if (buffer[2] == ' ' && buffer[3] == 'E' && buffer[4] == 'L')
         {
           /* Get position */
-          Serial.print("AZ");
-          Serial.print(inputAZ, 1);
-          Serial.print(" ");
-          Serial.print("EL");
-          Serial.println(inputEL, 1);
+          myRS485Serial.print("AZ");
+          myRS485Serial.print(inputAZ, 1);
+          myRS485Serial.print(" ");
+          myRS485Serial.print("EL");
+          myRS485Serial.println(inputEL, 1);
         }
         else
         {
@@ -67,10 +67,10 @@ double * cmd_proc()
             }
           }
           if (debug) {
-            Serial.print(set_point[0]);
-            Serial.print(" ");
-            Serial.print(set_point[1]);
-            Serial.print(" ");
+            myRS485Serial.print(set_point[0]);
+            myRS485Serial.print(" ");
+            myRS485Serial.print(set_point[1]);
+            myRS485Serial.print(" ");
           }
         }
       }
@@ -78,11 +78,11 @@ double * cmd_proc()
       else if (buffer[0] == 'S' && buffer[1] == 'A' && buffer[2] == ' ' && buffer[3] == 'S' && buffer[4] == 'E')
       {
         /* Get position */
-        Serial.print("AZ");
-        Serial.print(inputAZ, 1);
-        Serial.print(" ");
-        Serial.print("EL");
-        Serial.println(inputEL, 1);
+        myRS485Serial.print("AZ");
+        myRS485Serial.print(inputAZ, 1);
+        myRS485Serial.print(" ");
+        myRS485Serial.print("EL");
+        myRS485Serial.println(inputEL, 1);
         set_point[0] = inputAZ;
         set_point[1] = inputEL;
       }
@@ -90,11 +90,11 @@ double * cmd_proc()
       else if (buffer[0] == 'R' && buffer[1] == 'E' && buffer[2] == 'S' && buffer[3] == 'E' && buffer[4] == 'T')
       {
         /* Get position */
-        Serial.print("AZ");
-        Serial.print(inputAZ, 1);
-        Serial.print(" ");
-        Serial.print("EL");
-        Serial.println(inputEL, 1);
+        myRS485Serial.print("AZ");
+        myRS485Serial.print(inputAZ, 1);
+        myRS485Serial.print(" ");
+        myRS485Serial.print("EL");
+        myRS485Serial.println(inputEL, 1);
         /* Move to initial position */
         Homing(false);
         set_point[0] = 0;
@@ -128,9 +128,9 @@ double * cmd_proc()
             AZ_Kd = atof(data);
           }
         }
-        Serial.print("AZ_Kp: ");Serial.print(AZ_Kp);
-        Serial.print(" AZ_Ki: ");Serial.print(AZ_Ki);
-        Serial.print(" AZ_Kd: ");Serial.println(AZ_Kd);
+        myRS485Serial.print("AZ_Kp: ");myRS485Serial.print(AZ_Kp);
+        myRS485Serial.print(" AZ_Ki: ");myRS485Serial.print(AZ_Ki);
+        myRS485Serial.print(" AZ_Kd: ");myRS485Serial.println(AZ_Kd);
         pidAZ.SetTunings(AZ_Kp, AZ_Ki, AZ_Kd);
       }
       else if (buffer[0] == 'K' && buffer[1] == 'E') {
@@ -161,9 +161,9 @@ double * cmd_proc()
             EL_Kd = atof(data);
           }
         }
-        Serial.print("EL_Kp: ");Serial.print(EL_Kp);
-        Serial.print(" EL_Ki: ");Serial.print(EL_Ki);
-        Serial.print(" EL_Kd: ");Serial.println(EL_Kd);
+        myRS485Serial.print("EL_Kp: ");myRS485Serial.print(EL_Kp);
+        myRS485Serial.print(" EL_Ki: ");myRS485Serial.print(EL_Ki);
+        myRS485Serial.print(" EL_Kd: ");myRS485Serial.println(EL_Kd);
         pidEL.SetTunings(EL_Kp, EL_Ki, EL_Kd);
       }
       else if (buffer[0] == 'D' && buffer[1] == 'B')
@@ -173,26 +173,26 @@ double * cmd_proc()
       else if (buffer[0] == 'A' && buffer[1] == 'T')
       {
         adaptiveTuning = !adaptiveTuning;
-        Serial.print("Adaptive is turned ");Serial.println((adaptiveTuning)?"on":"off");
+        myRS485Serial.print("Adaptive is turned ");myRS485Serial.println((adaptiveTuning)?"on":"off");
       }
       else if (buffer[0] == 'S' && buffer[1] == 'T')
       {
-        Serial.print("Status\n");
-        Serial.print("AZ_Kp: ");Serial.print(pidAZ.GetKp());
-        Serial.print(" AZ_Ki: ");Serial.print(pidAZ.GetKi());
-        Serial.print(" AZ_Kd: ");Serial.println(pidAZ.GetKd());
-        Serial.print("EL_Kp: ");Serial.print(pidEL.GetKp());
-        Serial.print(" EL_Ki: ");Serial.print(pidEL.GetKi());
-        Serial.print(" EL_Kd: ");Serial.println(pidEL.GetKd());
-        Serial.print(millis());
-        Serial.print(" setpointAZ: ");Serial.print(setpointAZ);
-        Serial.print(" inputAZ: ");Serial.print(inputAZ);
-        Serial.print(" outputAZ:");Serial.print(outputAZ);
+        myRS485Serial.print("Status\n");
+        myRS485Serial.print("AZ_Kp: ");myRS485Serial.print(pidAZ.GetKp());
+        myRS485Serial.print(" AZ_Ki: ");myRS485Serial.print(pidAZ.GetKi());
+        myRS485Serial.print(" AZ_Kd: ");myRS485Serial.println(pidAZ.GetKd());
+        myRS485Serial.print("EL_Kp: ");myRS485Serial.print(pidEL.GetKp());
+        myRS485Serial.print(" EL_Ki: ");myRS485Serial.print(pidEL.GetKi());
+        myRS485Serial.print(" EL_Kd: ");myRS485Serial.println(pidEL.GetKd());
+        myRS485Serial.print(millis());
+        myRS485Serial.print(" setpointAZ: ");myRS485Serial.print(setpointAZ);
+        myRS485Serial.print(" inputAZ: ");myRS485Serial.print(inputAZ);
+        myRS485Serial.print(" outputAZ:");myRS485Serial.print(outputAZ);
 
-        Serial.print(" setpointEL: ");Serial.print(setpointEL);
-        Serial.print(" inputEL: ");Serial.print(inputEL);
-        Serial.print(" outputEL:");Serial.println(outputEL);
-        Serial.print("adaptive: ");Serial.println((adaptiveTuning?"on":"off"));
+        myRS485Serial.print(" setpointEL: ");myRS485Serial.print(setpointEL);
+        myRS485Serial.print(" inputEL: ");myRS485Serial.print(inputEL);
+        myRS485Serial.print(" outputEL:");myRS485Serial.println(outputEL);
+        myRS485Serial.print("adaptive: ");myRS485Serial.println((adaptiveTuning?"on":"off"));
       }
       else if (buffer[0] == 'F' && buffer[1] == 'A')
       {

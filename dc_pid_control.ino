@@ -2,6 +2,9 @@
 #include <PGMWrap.h>
 #include <PID_v1.h>
 
+#include "RS485Serial.h"
+RS485Serial myRS485Serial = RS485Serial();
+
 #include "fatal.h"
 #include "as5601.h"
 #include "motor.h"
@@ -48,7 +51,7 @@ AS5601<SoftWire> encoder_EL(Wire2);
 #define MAXSPEED_AZ 140
 #define MAXSPEED_EL 160
 #define OFFSET_SPEED_AZ 18
-#define OFFSET_SPEED_EL 120
+#define OFFSET_SPEED_EL 115
 
 #define DEADZONE_AZ 0.2
 #define DEADZONE_EL 0.3
@@ -93,9 +96,15 @@ int startTime;
 
 void setup() {
   double limitAZ, limitEL;
-  
+
+  pinMode(TX_EN, OUTPUT);
+  digitalWrite(TX_EN, LOW);  
   Serial.begin(BaudRate);
-  Serial.print("1. Init\n");
+  myRS485Serial.setPrinter(Serial);
+  myRS485Serial.setTXpin(TX_EN);
+  myRS485Serial.setDelay(10);
+  
+  myRS485Serial.print("1. Init\n");
 
   /* H-bridge */
   pinMode(OUTPUT, PWM1M1);
@@ -126,12 +135,12 @@ void setup() {
   setpointEL = inputEL;
   outputEL = 0;
 
-  Serial.print("2. Init encoders\n");
+  myRS485Serial.print("2. Init encoders\n");
 
   setPWMfreq();
   enableTimedInt();
 
-  Serial.print("3. Init timers\n");
+  myRS485Serial.print("3. Init timers\n");
 
   pidAZ.SetSampleTime(SAMPLE_TIME);
   limitAZ = MAXSPEED_AZ-OFFSET_SPEED_AZ;
@@ -143,12 +152,12 @@ void setup() {
   pidEL.SetOutputLimits(-limitEL,limitEL);
   pidEL.SetMode(AUTOMATIC);
 
-  Serial.print("4. Init PIDs\n");
+  myRS485Serial.print("4. Init PIDs\n");
 
   startTime = millis();
   
   initialized = true;
-  Serial.print("Setup\n");
+  myRS485Serial.print("Setup\n");
 
   Homing(true);
 }
@@ -237,9 +246,9 @@ void loop() {
   if (adaptiveTuning && !EL_local && abs(setpointEL - inputEL)<2) {
     pidEL.SetTunings(EL_KP_LOCAL, EL_KI_LOCAL, EL_KD_LOCAL, PON);
     EL_local = true;
-    if (debug) Serial.println("local EL tuning");
+    if (debug) myRS485Serial.println("local EL tuning");
   } else if (adaptiveTuning && EL_local && abs(setpointEL - inputEL)>=2) {
-    if (debug) Serial.println("global EL tuning");
+    if (debug) myRS485Serial.println("global EL tuning");
     pidEL.SetTunings(EL_KP, EL_KI, EL_KD, PON);
     EL_local = false;    
   }
@@ -283,23 +292,23 @@ void loop() {
     encoder_EL.get_pos(&inputEL);
   }
   
-  //Serial.print("Status:");Serial.print(statusAZ,HEX);Serial.print(" posAZ:");Serial.print(posAZ);Serial.print(" CONF: ");Serial.print(confAZ);Serial.print(" MAG: ");Serial.print(magAZ);Serial.print(" AGC: ");Serial.println(agcAZ);
-  //Serial.print("Status:");Serial.print(statusEL,HEX);Serial.print(" posEL:");Serial.print(posEL);Serial.print(" CONF: ");Serial.print(confEL);Serial.print(" MAG: ");Serial.print(magEL);Serial.print(" AGC: ");Serial.println(agcEL);
+  //myRS485Serial.print("Status:");myRS485Serial.print(statusAZ,HEX);myRS485Serial.print(" posAZ:");myRS485Serial.print(posAZ);myRS485Serial.print(" CONF: ");myRS485Serial.print(confAZ);myRS485Serial.print(" MAG: ");myRS485Serial.print(magAZ);myRS485Serial.print(" AGC: ");myRS485Serial.println(agcAZ);
+  //myRS485Serial.print("Status:");myRS485Serial.print(statusEL,HEX);myRS485Serial.print(" posEL:");myRS485Serial.print(posEL);myRS485Serial.print(" CONF: ");myRS485Serial.print(confEL);myRS485Serial.print(" MAG: ");myRS485Serial.print(magEL);myRS485Serial.print(" AGC: ");myRS485Serial.println(agcEL);
   if (debug) {
     dbgcount++;
     double myEL=outputEL, myAZ=outputAZ, myinEL = inputEL;
     if ((dbgcount > 1000) && ((myEL>1) || (myAZ>1))) {
-    Serial.print(millis());
-    Serial.print(" setpointAZ: ");Serial.print(setpointAZ);
-    Serial.print(" inputAZ: ");Serial.print(inputAZ);
-    Serial.print(" outputAZ:");Serial.print(myAZ);
+    myRS485Serial.print(millis());
+    myRS485Serial.print(" setpointAZ: ");myRS485Serial.print(setpointAZ);
+    myRS485Serial.print(" inputAZ: ");myRS485Serial.print(inputAZ);
+    myRS485Serial.print(" outputAZ:");myRS485Serial.print(myAZ);
     
-    Serial.print(" setpointEL: ");Serial.print(setpointEL);
-    Serial.print(" inputEL: ");Serial.print(myinEL);
-    Serial.print(" outputEL:");Serial.println(myEL);
+    myRS485Serial.print(" setpointEL: ");myRS485Serial.print(setpointEL);
+    myRS485Serial.print(" inputEL: ");myRS485Serial.print(myinEL);
+    myRS485Serial.print(" outputEL:");myRS485Serial.println(myEL);
     dbgcount=0;
     }
   }
   
-  //Serial.println(ovf_count);
+  //myRS485Serial.println(ovf_count);
 }

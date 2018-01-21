@@ -78,11 +78,11 @@ public:
       fatal(FATAL_AS5601);
       
   #ifdef AS5601_DEBUG    
-        Serial.print("raw_angle: ");
-        Serial.print(raw_angle);
-        Serial.print(" status: ");
-        Serial.print(status_val&0x38);
-        Serial.print("\n");
+        myRS485Serial.print("raw_angle: ");
+        myRS485Serial.print(raw_angle);
+        myRS485Serial.print(" status: ");
+        myRS485Serial.print(status_val&0x38);
+        myRS485Serial.print("\n");
   #endif
   
     *new_pos = real_pos;
@@ -104,7 +104,7 @@ public:
   void set_zero() {
     double current_pos;
     unsigned char status_val = get_pos(&current_pos);
-    Serial.print("set_zero: ");Serial.println(current_pos);
+    myRS485Serial.print("set_zero: ");myRS485Serial.println(current_pos);
     angle_offset = current_pos;
   }
   

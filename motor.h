@@ -18,7 +18,7 @@ public:
 //    dbgcount++;
 //    if ((dbgcount>1000) && (speed!=0)) {
 //      dbgcount=0;
-//      Serial.print("speed: ");Serial.print(speed);
+//      myRS485Serial.print("speed: ");myRS485Serial.print(speed);
 //    }
 //    
     if (speed == 0) {
@@ -33,7 +33,7 @@ public:
         speed = _maxSpeed;
       analogWrite(_pwm_pin1, 0);
       analogWrite(_pwm_pin2, speed);
-      //Serial.print("rechts pwm1 ");Serial.print(_pwm_pin1);Serial.print("pwm2 ");Serial.print(_pwm_pin2);Serial.print("speed: ");Serial.println(speed);
+      //myRS485Serial.print("rechts pwm1 ");myRS485Serial.print(_pwm_pin1);myRS485Serial.print("pwm2 ");myRS485Serial.print(_pwm_pin2);myRS485Serial.print("speed: ");myRS485Serial.println(speed);
     }
     else
     {
@@ -43,7 +43,7 @@ public:
         speed = _maxSpeed;
       analogWrite(_pwm_pin1, speed);
       analogWrite(_pwm_pin2, 0);
-      //Serial.print("links pwm1 ");Serial.print(_pwm_pin1);Serial.print("pwm2 ");Serial.print(_pwm_pin2);Serial.print("speed: ");Serial.println(speed);
+      //myRS485Serial.print("links pwm1 ");myRS485Serial.print(_pwm_pin1);myRS485Serial.print("pwm2 ");myRS485Serial.print(_pwm_pin2);myRS485Serial.print("speed: ");myRS485Serial.println(speed);
     }
     stopped = false;
   }

@@ -47,8 +47,8 @@ void Homing(bool Init)
   while(!seek_AZ || !seek_EL) {
     encoder_AZ.get_pos(&inputAZ);
     encoder_EL.get_pos(&inputEL);
-    Serial.print("current AZ: "); Serial.print(setpointAZ); Serial.print("/"); Serial.print(inputAZ);Serial.print(" outputAZ:");Serial.print(outputAZ);
-    Serial.print(" current EL: "); Serial.print(setpointEL); Serial.print("/"); Serial.print(inputEL);Serial.print(" outputEL:");Serial.println(outputEL);
+    myRS485Serial.print("current AZ: "); myRS485Serial.print(setpointAZ); myRS485Serial.print("/"); myRS485Serial.print(inputAZ);myRS485Serial.print(" outputAZ:");myRS485Serial.print(outputAZ);
+    myRS485Serial.print(" current EL: "); myRS485Serial.print(setpointEL); myRS485Serial.print("/"); myRS485Serial.print(inputEL);myRS485Serial.print(" outputEL:");myRS485Serial.println(outputEL);
     if ((inputAZ - startAZ) >= (abs(SEEK_MOVE)-DEADZONE_AZ) && !isHome_AZ && Init) {
       seek_AZ = true;
     }
@@ -64,7 +64,7 @@ void Homing(bool Init)
   {
     encoder_AZ.get_pos(&inputAZ);
     value_Home_AZ = digitalRead(HOME_AZ);
-    //Serial.print("switches: "); Serial.print(value_Home_AZ);Serial.print(value_Home_EL);
+    //myRS485Serial.print("switches: "); myRS485Serial.print(value_Home_AZ);myRS485Serial.print(value_Home_EL);
     /* Change to LOW according to Home sensor */
     if (value_Home_AZ == DEFAULT_HOME_STATE && isHome_AZ == false)
     {
@@ -78,7 +78,7 @@ void Homing(bool Init)
       setpointAZ = 0;
       pidAZ.SetTunings(AZ_Kp, AZ_Ki, AZ_Kd, PON);
       pidAZ.SetMode(AUTOMATIC);
-      Serial.print("homing AZ: "); Serial.print(setpointAZ); Serial.print("/"); Serial.print(inputAZ);Serial.print(" outputAZ:");Serial.println(outputAZ);
+      myRS485Serial.print("homing AZ: "); myRS485Serial.print(setpointAZ); myRS485Serial.print("/"); myRS485Serial.print(inputAZ);myRS485Serial.print(" outputAZ:");myRS485Serial.println(outputAZ);
     }
     encoder_EL.get_pos(&inputEL);
     value_Home_EL = digitalRead(HOME_EL);
@@ -94,15 +94,15 @@ void Homing(bool Init)
       setpointEL = 0;
       pidEL.SetTunings(EL_Kp, EL_Ki, EL_Kd, PON);
       pidEL.SetMode(AUTOMATIC);
-      Serial.print("homing EL: "); Serial.print(setpointEL); Serial.print("/"); Serial.print(inputEL);Serial.print(" outputEL:");Serial.println(outputEL);
+      myRS485Serial.print("homing EL: "); myRS485Serial.print(setpointEL); myRS485Serial.print("/"); myRS485Serial.print(inputEL);myRS485Serial.print(" outputEL:");myRS485Serial.println(outputEL);
     }
     encoder_AZ.get_pos(&inputAZ);
     encoder_EL.get_pos(&inputEL);
     if (debug) {
-      Serial.print("current AZ: "); Serial.print(setpointAZ); Serial.print("/"); Serial.print(inputAZ);Serial.print(" outputAZ:");Serial.print(outputAZ);
-      Serial.print(" current EL: "); Serial.print(setpointEL); Serial.print("/"); Serial.print(inputEL);Serial.print(" outputEL:");Serial.println(outputEL);
-//    Serial.print(getM1CurrentMilliamps());Serial.print(" ");
-//    Serial.print(getM2CurrentMilliamps());Serial.print("\n");
+      myRS485Serial.print("current AZ: "); myRS485Serial.print(setpointAZ); myRS485Serial.print("/"); myRS485Serial.print(inputAZ);myRS485Serial.print(" outputAZ:");myRS485Serial.print(outputAZ);
+      myRS485Serial.print(" current EL: "); myRS485Serial.print(setpointEL); myRS485Serial.print("/"); myRS485Serial.print(inputEL);myRS485Serial.print(" outputEL:");myRS485Serial.println(outputEL);
+//    myRS485Serial.print(getM1CurrentMilliamps());myRS485Serial.print(" ");
+//    myRS485Serial.print(getM2CurrentMilliamps());myRS485Serial.print("\n");
     }      
     if ((abs(inputAZ - startAZ) >= abs(SEEK_AZ_ANGLE-DEADZONE_AZ) && !isHome_AZ) || (abs(inputEL - startEL) >= abs(SEEK_EL_ANGLE-DEADZONE_EL) && !isHome_EL))
     {
