@@ -1,0 +1,26 @@
+This firmware is meant for the DC motor solution of the v3.1 Satnogs Rotator with AS5601 encoder.
+It was based on the source code from the satnogs-rotator-controller repository.
+(https://github.com/satnogs/satnogs-rotator-controller roughly at commit d484c5249ea45e8c78a45f39fadb60a1163fa03c)
+
+Main changes:
+
+- based on Arduino PID Library (https://playground.arduino.cc/Code/PIDLibrary)
+- using a 1KHz timer interrupt
+- separated the AS5601 and motor control commands
+- expanded serial command with debug commands
+
+Some issues:
+
+- AS5601 I2C communication uses interrupts so outside interrupt handler
+- Using the V2 PCB without I2C multiplexer requires soft i2c for 1 chip
+- Elevation rotor has heavy load and oscillates: needed 2 sets of PID parameters. 
+  One set for local range, one set for large range movements.
+
+Todo:
+
+- integrate RS485 (now using simple uart to Arduino)
+- cleanup command parsing
+- add more safety checks such as current feedback sensing, non-movement etc.
+
+
+
