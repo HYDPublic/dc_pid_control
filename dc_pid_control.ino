@@ -50,8 +50,8 @@ AS5601<SoftWire> encoder_EL(Wire2);
 
 #define MAXSPEED_AZ 140
 #define MAXSPEED_EL 160
-#define OFFSET_SPEED_AZ 18
-#define OFFSET_SPEED_EL 115
+#define OFFSET_SPEED_AZ 20
+#define OFFSET_SPEED_EL 120
 
 #define DEADZONE_AZ 0.2
 #define DEADZONE_EL 0.3
@@ -59,9 +59,9 @@ AS5601<SoftWire> encoder_EL(Wire2);
 motor motor_AZ(PWM1M1, PWM2M1, MAXSPEED_AZ, OFFSET_SPEED_AZ);
 motor motor_EL(PWM1M2, PWM2M2, MAXSPEED_EL, OFFSET_SPEED_EL);
 
-#define AZ_KP          5.5
+#define AZ_KP          3
 #define AZ_KI          0.0
-#define AZ_KD          0.1
+#define AZ_KD          0
 
 #define EL_KP_HOMEING   4
 #define EL_KI_HOMEING   0
@@ -71,11 +71,11 @@ motor motor_EL(PWM1M2, PWM2M2, MAXSPEED_EL, OFFSET_SPEED_EL);
 #define EL_KI          0
 #define EL_KD          0.1
 
-#define EL_KP_LOCAL          2.3
-#define EL_KI_LOCAL          1
-#define EL_KD_LOCAL          0.2
+#define EL_KP_LOCAL          1.7 
+#define EL_KI_LOCAL          0.5
+#define EL_KD_LOCAL          0
 
-#define SAMPLE_TIME    10
+#define SAMPLE_TIME    1
 
 volatile double setpointAZ, inputAZ, outputAZ;
 volatile double setpointEL, inputEL, outputEL;
