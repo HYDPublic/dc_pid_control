@@ -1,4 +1,4 @@
-#define DEBUG true
+//#define DEBUG 
 
 /* EasyComm 2 Protocol */
 double * cmd_proc()

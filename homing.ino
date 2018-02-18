@@ -10,7 +10,6 @@
 #define HOME_AZ 3
 #define HOME_EL 4
 
-#define DEBUG true
 
 /* Homing Function */
 void Homing(bool Init)
