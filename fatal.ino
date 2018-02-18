@@ -9,7 +9,7 @@ void fatal(unsigned char msgid) {
   motor_EL.stop();
   disableTimedInt();
   while(1) {
-    Serial.println(fatal_messages[msgid]);
+    myRS485Serial.println(fatal_messages[msgid]);
     delay(1000);
   }  
 }

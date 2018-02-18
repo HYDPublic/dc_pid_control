@@ -10,7 +10,6 @@
 #define HOME_AZ 3
 #define HOME_EL 4
 
-#define DEBUG true
 
 /* Homing Function */
 void Homing(bool Init)
@@ -24,6 +23,8 @@ void Homing(bool Init)
   double startAZ, startEL;
   double curr_angle[2];
   double set_point[2];
+
+  pidEL.SetTunings(EL_KP_HOMEING, EL_KI_HOMEING, EL_KD_HOMEING, PON);
 
   encoder_AZ.get_pos(&startAZ);
   encoder_EL.get_pos(&startEL);
@@ -45,8 +46,8 @@ void Homing(bool Init)
   while(!seek_AZ || !seek_EL) {
     encoder_AZ.get_pos(&inputAZ);
     encoder_EL.get_pos(&inputEL);
-    Serial.print("current AZ: "); Serial.print(setpointAZ); Serial.print("/"); Serial.print(inputAZ);Serial.print(" outputAZ:");Serial.print(outputAZ);
-    Serial.print(" current EL: "); Serial.print(setpointEL); Serial.print("/"); Serial.print(inputEL);Serial.print(" outputEL:");Serial.println(outputEL);
+    myRS485Serial.print("current AZ: "); myRS485Serial.print(setpointAZ); myRS485Serial.print("/"); myRS485Serial.print(inputAZ);myRS485Serial.print(" outputAZ:");myRS485Serial.print(outputAZ);
+    myRS485Serial.print(" current EL: "); myRS485Serial.print(setpointEL); myRS485Serial.print("/"); myRS485Serial.print(inputEL);myRS485Serial.print(" outputEL:");myRS485Serial.println(outputEL);
     if ((inputAZ - startAZ) >= (abs(SEEK_MOVE)-DEADZONE_AZ) && !isHome_AZ && Init) {
       seek_AZ = true;
     }
@@ -62,21 +63,21 @@ void Homing(bool Init)
   {
     encoder_AZ.get_pos(&inputAZ);
     value_Home_AZ = digitalRead(HOME_AZ);
-    //Serial.print("switches: "); Serial.print(value_Home_AZ);Serial.print(value_Home_EL);
+    //myRS485Serial.print("switches: "); myRS485Serial.print(value_Home_AZ);myRS485Serial.print(value_Home_EL);
     /* Change to LOW according to Home sensor */
     if (value_Home_AZ == DEFAULT_HOME_STATE && isHome_AZ == false)
     {
       isHome_AZ = true;
       pidAZ.SetMode(MANUAL);
+      outputAZ=0;
+      motor_AZ.stop();
       if (Init)
         encoder_AZ.set_zero();
       encoder_AZ.get_pos(&inputAZ);
       setpointAZ = 0;
-      outputAZ=0;
-      motor_AZ.stop();
-      //pidAZ.SetTunings(AZ_Kp, AZ_Ki, AZ_Kd);
+      pidAZ.SetTunings(AZ_Kp, AZ_Ki, AZ_Kd, PON);
       pidAZ.SetMode(AUTOMATIC);
-      Serial.print("homing AZ: "); Serial.print(setpointAZ); Serial.print("/"); Serial.print(inputAZ);Serial.print(" outputAZ:");Serial.println(outputAZ);
+      myRS485Serial.print("homing AZ: "); myRS485Serial.print(setpointAZ); myRS485Serial.print("/"); myRS485Serial.print(inputAZ);myRS485Serial.print(" outputAZ:");myRS485Serial.println(outputAZ);
     }
     encoder_EL.get_pos(&inputEL);
     value_Home_EL = digitalRead(HOME_EL);
@@ -84,27 +85,24 @@ void Homing(bool Init)
     {
       isHome_EL = true;
       pidEL.SetMode(MANUAL);      
+      outputEL = 0;
+      motor_EL.stop();
       if (Init)
         encoder_EL.set_zero();;
       encoder_EL.get_pos(&inputEL);
       setpointEL = 0;
-      outputEL = 0;
-      motor_EL.stop();
-      pidEL.SetTunings(EL_Kp, EL_Ki, EL_Kd);
+      pidEL.SetTunings(EL_Kp, EL_Ki, EL_Kd, PON);
       pidEL.SetMode(AUTOMATIC);
-      Serial.print("homing EL: "); Serial.print(setpointEL); Serial.print("/"); Serial.print(inputEL);Serial.print(" outputEL:");Serial.println(outputEL);
+      myRS485Serial.print("homing EL: "); myRS485Serial.print(setpointEL); myRS485Serial.print("/"); myRS485Serial.print(inputEL);myRS485Serial.print(" outputEL:");myRS485Serial.println(outputEL);
     }
     encoder_AZ.get_pos(&inputAZ);
     encoder_EL.get_pos(&inputEL);
-#ifdef DEBUG
-    digitalWrite(TX_EN, HIGH);
-    Serial.print("current AZ: "); Serial.print(setpointAZ); Serial.print("/"); Serial.print(inputAZ);Serial.print(" outputAZ:");Serial.print(outputAZ);
-    Serial.print(" current EL: "); Serial.print(setpointEL); Serial.print("/"); Serial.print(inputEL);Serial.print(" outputEL:");Serial.println(outputEL);
-//    Serial.print(getM1CurrentMilliamps());Serial.print(" ");
-//    Serial.print(getM2CurrentMilliamps());Serial.print("\n");
-    digitalWrite(TX_EN, LOW);
-#endif
-      
+    if (debug) {
+      myRS485Serial.print("current AZ: "); myRS485Serial.print(setpointAZ); myRS485Serial.print("/"); myRS485Serial.print(inputAZ);myRS485Serial.print(" outputAZ:");myRS485Serial.print(outputAZ);
+      myRS485Serial.print(" current EL: "); myRS485Serial.print(setpointEL); myRS485Serial.print("/"); myRS485Serial.print(inputEL);myRS485Serial.print(" outputEL:");myRS485Serial.println(outputEL);
+//    myRS485Serial.print(getM1CurrentMilliamps());myRS485Serial.print(" ");
+//    myRS485Serial.print(getM2CurrentMilliamps());myRS485Serial.print("\n");
+    }      
     if ((abs(inputAZ - startAZ) >= abs(SEEK_AZ_ANGLE-DEADZONE_AZ) && !isHome_AZ) || (abs(inputEL - startEL) >= abs(SEEK_EL_ANGLE-DEADZONE_EL) && !isHome_EL))
     {
       fatal(FATAL_HOMING);
