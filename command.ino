@@ -1,4 +1,14 @@
-//#define DEBUG 
+//#define DEBUG
+
+/* Maximum setpoint angles */
+#define MIN_AZ_ANGLE 0
+#define MAX_AZ_ANGLE 360
+#define MIN_EL_ANGLE 0
+#define MAX_EL_ANGLE 180
+
+/* We point the AZ homing switch to west
+   to help with the east/west crossing */
+#define AZ_OFFSET 90
 
 /* EasyComm 2 Protocol */
 double * cmd_proc()
@@ -10,8 +20,9 @@ double * cmd_proc()
   char incomingByte;
   char *Data = buffer;
   char *rawData;
-  char data[100];
+  char data[11];
   double pos[2];
+  int east = 1; //East is normal pass
 
   /* Read from serial */
   while (myRS485Serial.available() > 0)
@@ -28,9 +39,17 @@ double * cmd_proc()
       myRS485Serial.print("command: ");myRS485Serial.println(buffer);
 #endif
       delay(100); // delay before sending just in case
-      if (buffer[0] == 'A' && buffer[1] == 'Z')
+      if (Data[0] == 'O') {
+        rawData = strtok_r(Data, " " , &Data);
+        strncpy(data, rawData + 1, 10);
+        if (isNumber(data))
+        {
+          east = atoi(data);
+        }
+      }
+      if (Data[0] == 'A' && Data[1] == 'Z')
       {
-        if (buffer[2] == ' ' && buffer[3] == 'E' && buffer[4] == 'L')
+        if (Data[2] == ' ' && Data[3] == 'E' && Data[4] == 'L')
         {
           /* Get position */
           myRS485Serial.print("AZ");
@@ -51,6 +70,10 @@ double * cmd_proc()
               set_point[0] = MAX_AZ_ANGLE;
             else if (set_point[0] < MIN_AZ_ANGLE)
               set_point[0] = MIN_AZ_ANGLE;
+            set_point[0] += AZ_OFFSET;
+            if ((set_point[0])>360) {
+              set_point[0] -= 360;
+            }
           }
           /* Get the absolute value of angle */
           rawData = strtok_r(NULL, " " , &Data);
@@ -66,10 +89,21 @@ double * cmd_proc()
                 set_point[1] = MIN_EL_ANGLE;
             }
           }
+
+          // If west then we handle it
+          if (east == 0) {
+            // Flip the EL and AZ for west passage
+            set_point[0] = set_point[0] - 180;
+            if (set_point[0] < 0) set_point[0] += 360;
+            set_point[1] = 180 - set_point[1];
+          }
+          
           if (debug) {
             myRS485Serial.print(set_point[0]);
             myRS485Serial.print(" ");
             myRS485Serial.print(set_point[1]);
+            myRS485Serial.print(" ");
+            myRS485Serial.print(east);
             myRS485Serial.print(" ");
           }
         }

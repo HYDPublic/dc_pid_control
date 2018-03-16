@@ -1,13 +1,6 @@
 #include <Wire.h>
 
-// #define AS5601_DEBUG 
-
-/* Maximum Angle for homing scanning */
-#define SEEK_MOVE 20
-#define MIN_AZ_ANGLE -180
-#define MAX_AZ_ANGLE 370
-#define MIN_EL_ANGLE -180
-#define MAX_EL_ANGLE 180
+// #define AS5601_DEBUG
 
 /* Encoder defines */
 #define as5601_adr 0x36
@@ -22,8 +15,6 @@
 
 /* Ratio of encoder gear */
 #define RATIO 2
-
-
 
 template<class T_WIRE_METHOD> class AS5601
 {
@@ -58,7 +49,7 @@ public:
     static double raw_prev_pos = 0;
     static double real_pos;
     static int n = 0;
-  
+
     raw_angle = i2c_word_transaction(as5601_adr,raw_ang_high);
     /* Read Status Bits */
     status_val = i2c_byte_transaction(as5601_adr,status_reg);
@@ -76,15 +67,15 @@ public:
     }
     else
       fatal(FATAL_AS5601);
-      
-  #ifdef AS5601_DEBUG    
+
+  #ifdef AS5601_DEBUG
         myRS485Serial.print("raw_angle: ");
         myRS485Serial.print(raw_angle);
         myRS485Serial.print(" status: ");
         myRS485Serial.print(status_val&0x38);
         myRS485Serial.print("\n");
   #endif
-  
+
     *new_pos = real_pos;
     return status_val;
   }
@@ -92,7 +83,7 @@ public:
   unsigned char get_agc() {
     return i2c_byte_transaction(as5601_adr,agc);
   }
-  
+
   unsigned short get_magnitude() {
     return i2c_word_transaction(as5601_adr,magnitude_high);
   }
@@ -107,9 +98,9 @@ public:
     myRS485Serial.print("set_zero: ");myRS485Serial.println(current_pos);
     angle_offset = current_pos;
   }
-  
+
 private:
-  T_WIRE_METHOD& _wire;    
+  T_WIRE_METHOD& _wire;
   double angle_offset = 0;
 
   unsigned char i2c_byte_transaction(unsigned char i2c_address, unsigned char i2c_register)
